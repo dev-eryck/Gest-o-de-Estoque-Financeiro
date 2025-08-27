@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-2xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-muted-200 hover:bg-muted-300 text-muted-800 font-medium py-2 px-4 rounded-2xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-muted-400 focus:ring-offset-2;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-medium py-2 px-4 rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-danger {
+    @apply bg-danger-500 hover:bg-danger-600 text-white font-medium py-2 px-4 rounded-2xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-2;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center px-4 py-3 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-200 cursor-pointer;
+  }
+  
+  .sidebar-item.active {
+    @apply text-red-500 bg-red-50 font-medium;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-muted {
+    @apply bg-gray-100 text-gray-800;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Animações customizadas */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.bounce-gentle {
+  animation: bounceGentle 2s infinite;
+}
+
+/* Responsividade mobile-first */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .card {
+    @apply rounded-xl;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-outline, .btn-danger {
+    @apply py-3 px-6 text-sm;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+  
+  .input {
+    @apply bg-gray-800 border-gray-600 text-white;
+  }
+}
