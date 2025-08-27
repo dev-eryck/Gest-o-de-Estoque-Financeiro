@@ -8,7 +8,7 @@
     "server": "nodemon server/index.js",
     "start": "node server/index.js",
     "client": "cd client && npm start",
-    "build": "cd client && npm run build",
+    "build": "echo 'Backend build - no frontend build needed'",
     "build:prod": "node scripts/build-production.js",
     "install-all": "npm install && cd client && npm install",
     "setup-db": "node server/setup-database.js",
