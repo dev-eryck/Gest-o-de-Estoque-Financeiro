@@ -16,6 +16,11 @@ RUN npm ci --only=production
 # Copiar pasta client (incluindo src, public, package.json, etc.)
 COPY client/ ./client/
 
+# Verificar o que foi copiado
+RUN echo "=== CONTEÚDO DA PASTA CLIENT ===" && ls -la client/
+RUN echo "=== CONTEÚDO DA PASTA PUBLIC ===" && ls -la client/public/
+RUN echo "=== CONTEÚDO DA PASTA SRC ===" && ls -la client/src/
+
 # Instalar dependências do client
 RUN cd client && npm ci --only=production
 
@@ -23,7 +28,7 @@ RUN cd client && npm ci --only=production
 RUN cd client && npm run build
 
 # Verificar se os arquivos foram criados
-RUN ls -la client/ && ls -la client/build/
+RUN echo "=== CONTEÚDO DA PASTA BUILD ===" && ls -la client/build/
 
 # Copiar código do servidor
 COPY server/ ./server/
