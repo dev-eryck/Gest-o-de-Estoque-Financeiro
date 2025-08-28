@@ -4,17 +4,17 @@ FROM node:18-alpine
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Copiar TUDO de uma vez
-COPY . .
+# Copiar package.json e package-lock.json da raiz
+COPY package*.json ./
 
 # Instalar dependências da raiz
 RUN npm ci --only=production
 
-# Instalar dependências do client
-RUN cd client && npm ci --only=production
+# Copiar pasta client (já buildada)
+COPY client/ ./client/
 
-# Fazer build do frontend
-RUN cd client && npm run build
+# Copiar código do servidor
+COPY server/ ./server/
 
 # Expor porta
 EXPOSE 5000

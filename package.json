@@ -9,6 +9,7 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "cd client && npm install && npm run build",
+    "build:docker": "cd client && npm install && npm run build",
     "build:prod": "node scripts/build-production.js"
   },
   "keywords": [
