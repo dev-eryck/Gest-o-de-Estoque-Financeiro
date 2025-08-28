@@ -24,9 +24,14 @@ app.use('/api/vendas', require('./routes/vendas'));
 app.use('/api/funcionarios', require('./routes/funcionarios'));
 app.use('/api/auth', require('./routes/auth'));
 
-// Health check
+// Health check melhorado
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Serve static files from React build
@@ -40,7 +45,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-});
+// Iniciar servidor com delay para garantir que esteja pronto
+setTimeout(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📊 Health check disponível em: /api/health`);
+  });
+}, 2000); // 2 segundos de delay
