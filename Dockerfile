@@ -13,8 +13,12 @@ COPY package*.json ./
 # Instalar dependências da raiz
 RUN npm ci --only=production
 
-# Copiar pasta client (incluindo src, public, package.json, etc.)
-COPY client/ ./client/
+# Copiar cada pasta do client separadamente para garantir que tudo seja incluído
+COPY client/package*.json ./client/
+COPY client/src/ ./client/src/
+COPY client/public/ ./client/public/
+COPY client/tailwind.config.js ./client/
+COPY client/postcss.config.js ./client/
 
 # Verificar o que foi copiado
 RUN echo "=== CONTEÚDO DA PASTA CLIENT ===" && ls -la client/
