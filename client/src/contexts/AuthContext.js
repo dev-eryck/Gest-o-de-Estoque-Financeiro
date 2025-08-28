@@ -19,26 +19,32 @@ export const AuthProvider = ({ children }) => {
 
   // Verificar se há token salvo ao inicializar
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const usuarioSalvo = localStorage.getItem('usuario');
-    
-    if (token && usuarioSalvo) {
-      try {
-        const usuarioObj = JSON.parse(usuarioSalvo);
-        setUsuario(usuarioObj);
-        setIsAuthenticated(true);
-        
-        // Configurar token no axios
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-        // Buscar permissões
-        fetchPermissoes();
-      } catch (error) {
-        console.error('Erro ao restaurar sessão:', error);
-        logout();
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      const usuarioSalvo = localStorage.getItem('usuario');
+      
+      if (token && usuarioSalvo) {
+        try {
+          const usuarioObj = JSON.parse(usuarioSalvo);
+          setUsuario(usuarioObj);
+          setIsAuthenticated(true);
+          
+          // Configurar token no axios
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          // Buscar permissões e só então parar o loading
+          await fetchPermissoes();
+        } catch (error) {
+          console.error('Erro ao restaurar sessão:', error);
+          logout();
+        }
       }
-    }
-    setLoading(false);
+      
+      // Só parar o loading após tudo estar pronto
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const fetchPermissoes = async () => {
@@ -49,6 +55,19 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Erro ao buscar permissões:', error);
+      // Se falhar, definir permissões padrão
+      setPermissoes({
+        dashboard: true,
+        produtos: true,
+        vendas: true,
+        funcionarios: true,
+        estoque: true,
+        relatorios: true,
+        categorias: true,
+        controle_financeiro: true,
+        configuracao: true,
+        notificacoes: true
+      });
     }
   };
 
