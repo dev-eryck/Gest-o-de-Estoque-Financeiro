@@ -4,6 +4,9 @@ FROM node:18-alpine
 # Definir diretório de trabalho
 WORKDIR /app
 
+# Limpar cache do npm
+RUN npm cache clean --force
+
 # Copiar package.json e package-lock.json da raiz
 COPY package*.json ./
 
