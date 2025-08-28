@@ -12,7 +12,9 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    env: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -26,4 +28,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📊 Health check disponível em: /api/health`);
+  console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
 });
