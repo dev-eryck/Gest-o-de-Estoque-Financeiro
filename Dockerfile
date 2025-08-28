@@ -13,8 +13,11 @@ COPY package*.json ./
 # Instalar dependências da raiz
 RUN npm ci --only=production
 
-# Copiar pasta client (já buildada)
+# Copiar TODA a pasta client (incluindo build, src, public, etc.)
 COPY client/ ./client/
+
+# Verificar se os arquivos foram copiados
+RUN ls -la client/ && ls -la client/build/
 
 # Copiar código do servidor
 COPY server/ ./server/
