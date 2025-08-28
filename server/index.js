@@ -7,6 +7,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Forçar modo produção se estiver no Railway
+const NODE_ENV = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' ? 'production' : (process.env.NODE_ENV || 'development');
+
 // Middleware
 app.use(helmet());
 app.use(morgan('combined'));
@@ -24,7 +27,8 @@ app.get('/api/health', (req, res) => {
     status: 'OK', 
     timestamp: new Date().toISOString(),
     port: PORT,
-    env: process.env.NODE_ENV || 'development'
+    env: NODE_ENV,
+    railway_env: process.env.RAILWAY_ENVIRONMENT_NAME
   });
 });
 
@@ -35,7 +39,7 @@ app.use('/api/funcionarios', require('./routes/funcionarios'));
 app.use('/api/auth', require('./routes/auth'));
 
 // Serve static files from React build
-if (process.env.NODE_ENV === 'production') {
+if (NODE_ENV === 'production') {
   // Serve static files from the React app
   app.use(express.static(path.join(__dirname, '../client/build')));
 
@@ -48,7 +52,8 @@ if (process.env.NODE_ENV === 'production') {
 // Iniciar servidor
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌍 Ambiente: ${NODE_ENV}`);
+  console.log(`🚂 Railway Environment: ${process.env.RAILWAY_ENVIRONMENT_NAME}`);
   console.log(`📊 Health check disponível em: /api/health`);
   console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
 });
