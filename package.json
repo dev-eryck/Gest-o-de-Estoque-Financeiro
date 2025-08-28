@@ -9,6 +9,7 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "cd client && npm install && npm run build",
+    "postinstall": "cd client && npm install",
     "build:prod": "node scripts/build-production.js"
   },
   "keywords": [
@@ -35,3 +36,4 @@
     "sqlite3": "^5.1.6"
   }
 }
+
