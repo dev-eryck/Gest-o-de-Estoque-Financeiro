@@ -24,9 +24,26 @@ app.get('/api/test', (req, res) => {
 });
 
 // Iniciar servidor IMEDIATAMENTE
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📊 Health check disponível em: /api/health`);
   console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
+});
+
+// Lidar com sinais graciosamente
+process.on('SIGTERM', () => {
+  console.log('📴 Recebido SIGTERM, fechando servidor graciosamente...');
+  server.close(() => {
+    console.log('✅ Servidor fechado graciosamente');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('📴 Recebido SIGINT, fechando servidor graciosamente...');
+  server.close(() => {
+    console.log('✅ Servidor fechado graciosamente');
+    process.exit(0);
+  });
 });
