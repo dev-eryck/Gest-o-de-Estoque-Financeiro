@@ -11,7 +11,22 @@ const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' ? 'production' : (process.env.NODE_ENV || 'development');
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      upgradeInsecureRequests: []
+    }
+  }
+}));
 app.use(morgan('combined'));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
