@@ -10,7 +10,8 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "cd client && npm install && npm run build",
     "build:docker": "cd client && npm install && npm run build",
-    "build:prod": "node scripts/build-production.js"
+    "build:prod": "node scripts/build-production.js",
+    "create-admin": "node server/scripts/criar-admin-railway.js"
   },
   "keywords": [
     "estoque",
