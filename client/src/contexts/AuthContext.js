@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const AuthContext = createContext();
 
@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }) => {
           setUsuario(usuarioObj);
           setIsAuthenticated(true);
           
-          // Configurar token no axios
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          // Configurar token no api
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Buscar permissões e só então parar o loading
           await fetchPermissoes();
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchPermissoes = async () => {
     try {
-      const response = await axios.get('/api/auth/permissoes');
+      const response = await api.get('/api/auth/permissoes');
       if (response.data.success) {
         setPermissoes(response.data.data);
       }
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('🔐 Tentando fazer login...', { username });
       
-      const response = await axios.post('/api/auth/login', { username, senha });
+      const response = await api.post('/api/auth/login', { username, senha });
       
       if (response.data.success) {
         const { token, usuario: usuarioData } = response.data.data;
@@ -86,8 +86,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', token);
         localStorage.setItem('usuario', JSON.stringify(usuarioData));
         
-        // Configurar token no axios
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // Configurar token no api
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
         // Atualizar estado
         setUsuario(usuarioData);
@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         // Chamar API de logout
-        await axios.post('/api/auth/logout');
+        await api.post('/api/auth/logout');
       }
     } catch (error) {
       console.error('Erro no logout:', error);
@@ -125,8 +125,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       
-      // Limpar headers do axios
-      delete axios.defaults.headers.common['Authorization'];
+      // Limpar headers do api
+      delete api.defaults.headers.common['Authorization'];
       
       // Resetar estado
       setUsuario(null);
