@@ -12,6 +12,7 @@
     "build:docker": "cd client && npm install && npm run build",
     "build:prod": "node scripts/build-production.js",
     "create-admin": "node server/scripts/criar-admin-railway.js",
+    "create-eryck": "node server/scripts/criar-usuario-eryck.js",
     "check-db": "node server/scripts/verificar-status-banco.js"
   },
   "keywords": [
