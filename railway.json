@@ -12,6 +12,7 @@
   },
   "variables": {
     "NODE_ENV": "production",
-    "PORT": "5000"
+    "PORT": "5000",
+    "REACT_APP_API_URL": "https://gest-o-de-estoque-financeiro-production.up.railway.app"
   }
 }
