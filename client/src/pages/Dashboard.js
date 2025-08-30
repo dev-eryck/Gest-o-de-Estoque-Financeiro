@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Package, Users, ShoppingCart, DollarSign, AlertTriangle, ArrowUpRight, Activity } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {
@@ -26,9 +26,9 @@ const Dashboard = () => {
       
       // Buscar estatísticas
       const [produtosRes, funcionariosRes, vendasRes] = await Promise.all([
-        axios.get('/api/produtos'),
-        axios.get('/api/funcionarios'),
-        axios.get('/api/vendas')
+              api.get('/api/produtos'),
+      api.get('/api/funcionarios'),
+      api.get('/api/vendas')
       ]);
 
       const produtos = produtosRes.data.data || [];

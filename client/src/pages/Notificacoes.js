@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Check, Trash2, Filter, Search, AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import api from '../config/axios';
 
 const Notificacoes = () => {
   const [notificacoes, setNotificacoes] = useState([]);
@@ -17,7 +17,7 @@ const Notificacoes = () => {
   const fetchNotificacoes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/notificacoes');
+      const response = await api.get('/api/notificacoes');
       if (response.data.success) {
         setNotificacoes(response.data.data);
       }
@@ -46,7 +46,7 @@ const Notificacoes = () => {
 
   const marcarComoLida = async (id) => {
     try {
-      await axios.put(`/api/notificacoes/${id}/marcar-lida`);
+              await api.put(`/api/notificacoes/${id}/marcar-lida`);
       toast.success('Notificação marcada como lida');
       fetchNotificacoes(); // Recarregar notificações
     } catch (error) {
@@ -57,7 +57,7 @@ const Notificacoes = () => {
 
   const marcarTodasComoLidas = async () => {
     try {
-      await axios.put('/api/notificacoes/marcar-todas-lidas');
+              await api.put('/api/notificacoes/marcar-todas-lidas');
       toast.success('Todas as notificações foram marcadas como lidas');
       fetchNotificacoes(); // Recarregar notificações
     } catch (error) {
@@ -68,7 +68,7 @@ const Notificacoes = () => {
 
   const excluirNotificacao = async (id) => {
     try {
-      await axios.delete(`/api/notificacoes/${id}`);
+              await api.delete(`/api/notificacoes/${id}`);
       toast.success('Notificação excluída');
       fetchNotificacoes(); // Recarregar notificações
     } catch (error) {
@@ -80,7 +80,7 @@ const Notificacoes = () => {
   const limparTodas = async () => {
     if (window.confirm('Tem certeza que deseja limpar todas as notificações?')) {
       try {
-        await axios.delete('/api/notificacoes/limpar-todas');
+        await api.delete('/api/notificacoes/limpar-todas');
         toast.success('Todas as notificações foram limpas');
         fetchNotificacoes(); // Recarregar notificações
       } catch (error) {

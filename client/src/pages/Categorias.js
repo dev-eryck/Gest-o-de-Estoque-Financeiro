@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Package, Search, Filter } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Categorias = () => {
@@ -27,7 +27,7 @@ const Categorias = () => {
   const fetchCategorias = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/categorias');
+      const response = await api.get('/api/categorias');
       setCategorias(response.data.data || []);
     } catch (error) {
       console.error('Erro ao carregar categorias:', error);
@@ -42,10 +42,10 @@ const Categorias = () => {
     
     try {
       if (editingId) {
-        await axios.put(`/api/categorias/${editingId}`, formData);
+        await api.put(`/api/categorias/${editingId}`, formData);
         toast.success('Categoria atualizada com sucesso!');
       } else {
-        await axios.post('/api/categorias', formData);
+        await api.post('/api/categorias', formData);
         toast.success('Categoria criada com sucesso!');
       }
       
@@ -74,7 +74,7 @@ const Categorias = () => {
     }
 
     try {
-      await axios.delete(`/api/categorias/${id}`);
+              await api.delete(`/api/categorias/${id}`);
       toast.success('Categoria excluída com sucesso!');
       fetchCategorias();
     } catch (error) {

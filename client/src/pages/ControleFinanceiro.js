@@ -11,7 +11,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const ControleFinanceiro = () => {
@@ -46,9 +46,9 @@ const ControleFinanceiro = () => {
       setLoading(true);
       
       const [caixaRes, resumoRes, transacoesRes] = await Promise.all([
-        axios.get('/api/controle-financeiro/caixa-atual'),
-        axios.get(`/api/controle-financeiro/resumo?periodo=${periodo}`),
-        axios.get('/api/controle-financeiro')
+              api.get('/api/controle-financeiro/caixa-atual'),
+      api.get(`/api/controle-financeiro/resumo?periodo=${periodo}`),
+      api.get('/api/controle-financeiro')
       ]);
 
       setCaixaAtual(caixaRes.data.data);
@@ -95,10 +95,10 @@ const ControleFinanceiro = () => {
     
     try {
       if (editingTransaction) {
-        await axios.put(`/api/controle-financeiro/${editingTransaction.id}`, formData);
+        await api.put(`/api/controle-financeiro/${editingTransaction.id}`, formData);
         toast.success('Transação atualizada com sucesso!');
       } else {
-        await axios.post('/api/controle-financeiro', formData);
+        await api.post('/api/controle-financeiro', formData);
         toast.success('Transação criada com sucesso!');
       }
       
@@ -130,7 +130,7 @@ const ControleFinanceiro = () => {
     if (!window.confirm('Tem certeza que deseja deletar esta transação?')) return;
     
     try {
-      await axios.delete(`/api/controle-financeiro/${id}`);
+              await api.delete(`/api/controle-financeiro/${id}`);
       toast.success('Transação deletada com sucesso!');
       fetchData();
     } catch (error) {

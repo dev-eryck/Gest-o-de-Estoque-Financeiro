@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Edit, Trash2, Package, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Produtos = () => {
@@ -34,7 +34,7 @@ const Produtos = () => {
   const fetchProdutos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/produtos');
+      const response = await api.get('/api/produtos');
       // A API retorna {success: true, data: [...]}
       setProdutos(response.data.data || response.data || []);
     } catch (error) {
@@ -48,7 +48,7 @@ const Produtos = () => {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/categorias');
+      const response = await api.get('/api/categorias');
       // A API retorna {success: true, data: [...]}
       setCategorias(response.data.data || response.data || []);
     } catch (error) {
@@ -62,10 +62,10 @@ const Produtos = () => {
     
     try {
       if (editingProduct) {
-        await axios.put(`http://localhost:5000/api/produtos/${editingProduct.id}`, formData);
+        await api.put(`/api/produtos/${editingProduct.id}`, formData);
         toast.success('Produto atualizado com sucesso!');
       } else {
-        await axios.post('http://localhost:5000/api/produtos', formData);
+        await api.post('/api/produtos', formData);
         toast.success('Produto criado com sucesso!');
       }
       
@@ -96,7 +96,7 @@ const Produtos = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este produto?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/produtos/${id}`);
+        await api.delete(`/api/produtos/${id}`);
         toast.success('Produto excluído com sucesso!');
         fetchProdutos();
       } catch (error) {

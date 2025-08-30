@@ -34,7 +34,7 @@ function NovoFuncionario() {
     setLoading(true);
 
     try {
-      await axios.post('/api/funcionarios', formData);
+              await api.post('/api/funcionarios', formData);
       toast.success('Funcionário criado com sucesso!');
       navigate('/funcionarios');
     } catch (error) {

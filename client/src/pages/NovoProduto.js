@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Package } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 function NovoProduto() {
@@ -39,7 +39,7 @@ function NovoProduto() {
 
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('/api/categorias');
+      const response = await api.get('/api/categorias');
       setCategorias(response.data.data || []);
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
@@ -59,7 +59,7 @@ function NovoProduto() {
     setLoading(true);
 
     try {
-      await axios.post('/api/produtos', formData);
+              await api.post('/api/produtos', formData);
       toast.success('Produto criado com sucesso!');
       navigate('/produtos');
     } catch (error) {

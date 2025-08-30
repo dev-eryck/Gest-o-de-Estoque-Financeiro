@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Search, Command, Bell, User, LogOut, Edit, Save, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../../config/axios';
 import toast from 'react-hot-toast';
 
 const Topbar = () => {
@@ -49,7 +49,7 @@ const Topbar = () => {
 
   const fetchNotificacoesNaoLidas = async () => {
     try {
-      const response = await axios.get('/api/notificacoes/nao-lidas');
+      const response = await api.get('/api/notificacoes/nao-lidas');
       setNotificacoesNaoLidas(response.data.count || 0);
     } catch (error) {
       console.error('Erro ao buscar notificações:', error);
@@ -93,7 +93,7 @@ const Topbar = () => {
         updateData.newPassword = profileData.newPassword;
       }
 
-      await axios.put('/api/auth/perfil', updateData);
+              await api.put('/api/auth/perfil', updateData);
       toast.success('Perfil atualizado com sucesso!');
       
       // Atualizar dados do usuário localmente

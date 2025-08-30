@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Plus, Search, Filter, Package, TrendingUp, TrendingDown, AlertTriangle, BarChart3, ArrowUpDown } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Estoque = () => {
@@ -61,7 +61,7 @@ const Estoque = () => {
 
   const fetchProdutos = async () => {
     try {
-      const response = await axios.get('/api/produtos');
+      const response = await api.get('/api/produtos');
       setProdutos(response.data.data || []);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
@@ -72,7 +72,7 @@ const Estoque = () => {
   const fetchMovimentacoes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/estoque/movimentacoes');
+      const response = await api.get('/api/estoque/movimentacoes');
       setMovimentacoes(response.data.data || []);
     } catch (error) {
       toast.error('Erro ao carregar movimentações');
@@ -87,7 +87,7 @@ const Estoque = () => {
     e.preventDefault();
     
     try {
-      await axios.post('/api/estoque/movimentacao', formData);
+              await api.post('/api/estoque/movimentacao', formData);
       toast.success('Movimentação registrada com sucesso!');
       setShowForm(false);
       resetForm();

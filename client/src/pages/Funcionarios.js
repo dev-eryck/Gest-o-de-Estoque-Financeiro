@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import api from '../config/axios';
 import {
   Users,
   Plus,
@@ -93,7 +93,7 @@ const Funcionarios = () => {
   const fetchFuncionarios = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/funcionarios');
+      const response = await api.get('/api/funcionarios');
       setFuncionarios(response.data.data || response.data || []);
     } catch (error) {
       toast.error('Erro ao carregar funcionários');
@@ -147,7 +147,7 @@ const Funcionarios = () => {
       if (editingEmployee) {
         // Atualizar funcionário existente
         console.log('🔄 Atualizando funcionário:', editingEmployee.id);
-        await axios.put(`/api/funcionarios/${editingEmployee.id}`, formData);
+        await api.put(`/api/funcionarios/${editingEmployee.id}`, formData);
         toast.success('Funcionário atualizado com sucesso!');
       } else {
         // Criar novo funcionário
@@ -169,7 +169,7 @@ const Funcionarios = () => {
         console.log('  - Cargo:', funcionarioData.cargo, 'Válido:', !!funcionarioData.cargo);
         console.log('  - Status:', funcionarioData.status, 'Válido:', !!funcionarioData.status);
 
-        const funcionarioResponse = await axios.post('/api/funcionarios', funcionarioData);
+        const funcionarioResponse = await api.post('/api/funcionarios', funcionarioData);
         console.log('✅ Resposta da API:', funcionarioResponse.data);
         
         // Criar usuário se solicitado
@@ -191,7 +191,7 @@ const Funcionarios = () => {
               cargo: cargoPermissoes[formData.cargo] || 'estoque'
             };
 
-            const usuarioResponse = await axios.post('/api/auth/registro', usuarioData);
+            const usuarioResponse = await api.post('/api/auth/registro', usuarioData);
             console.log('✅ Usuário criado com sucesso:', usuarioResponse.data);
             toast.success('Funcionário e usuário criados com sucesso!');
           } catch (error) {
@@ -239,7 +239,7 @@ const Funcionarios = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este funcionário?')) {
       try {
-        await axios.delete(`/api/funcionarios/${id}`);
+        await api.delete(`/api/funcionarios/${id}`);
         toast.success('Funcionário excluído com sucesso!');
         fetchFuncionarios();
       } catch (error) {

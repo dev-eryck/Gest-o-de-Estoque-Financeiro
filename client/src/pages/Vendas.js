@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, ShoppingCart, DollarSign, Calendar, User, Package, Edit, Trash2, Receipt } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 const Vendas = () => {
@@ -35,7 +35,7 @@ const Vendas = () => {
   const fetchVendas = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/vendas');
+      const response = await api.get('/api/vendas');
       // A API retorna {success: true, data: [...]}
       setVendas(response.data.data || response.data || []);
     } catch (error) {
@@ -49,7 +49,7 @@ const Vendas = () => {
 
   const fetchProdutos = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/produtos');
+      const response = await api.get('/api/produtos');
       // A API retorna {success: true, data: [...]}
       setProdutos(response.data.data || response.data || []);
     } catch (error) {
@@ -60,7 +60,7 @@ const Vendas = () => {
 
   const fetchFuncionarios = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/funcionarios');
+      const response = await api.get('/api/funcionarios');
       // A API retorna {success: true, data: [...]}
       const funcionariosData = response.data.data || response.data || [];
       setFuncionarios(Array.isArray(funcionariosData) ? funcionariosData.filter(f => f.status === 'ativo') : []);
@@ -75,10 +75,10 @@ const Vendas = () => {
     
     try {
       if (editingSale) {
-        await axios.put(`http://localhost:5000/api/vendas/${editingSale.id}`, formData);
+        await api.put(`/api/vendas/${editingSale.id}`, formData);
         toast.success('Venda atualizada com sucesso!');
       } else {
-        await axios.post('http://localhost:5000/api/vendas', formData);
+        await api.post('/api/vendas', formData);
         toast.success('Venda registrada com sucesso!');
       }
       
@@ -109,7 +109,7 @@ const Vendas = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir esta venda? O estoque será restaurado.')) {
       try {
-        await axios.delete(`http://localhost:5000/api/vendas/${id}`);
+        await api.delete(`/api/vendas/${id}`);
         toast.success('Venda excluída com sucesso!');
         fetchVendas();
         fetchProdutos(); // Atualizar estoque

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, ShoppingCart } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 
 function NovaVenda() {
@@ -24,8 +24,8 @@ function NovaVenda() {
   const fetchData = async () => {
     try {
       const [produtosRes, funcionariosRes] = await Promise.all([
-        axios.get('/api/produtos'),
-        axios.get('/api/funcionarios')
+              api.get('/api/produtos'),
+      api.get('/api/funcionarios')
       ]);
       
       setProdutos(produtosRes.data.data || []);
@@ -64,7 +64,7 @@ function NovaVenda() {
     setLoading(true);
 
     try {
-      await axios.post('/api/vendas', formData);
+              await api.post('/api/vendas', formData);
       toast.success('Venda registrada com sucesso!');
       navigate('/vendas');
     } catch (error) {
