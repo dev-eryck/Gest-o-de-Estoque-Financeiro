@@ -20,6 +20,55 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+// POST /api/auth/configurar-permissoes - Configurar permissões para cargo gerente (REMOVER EM PRODUÇÃO)
+router.post('/configurar-permissoes', async (req, res) => {
+  try {
+    console.log('🔐 Configurando permissões para cargo gerente...');
+    
+    // Configurar permissões para cargo 'gerente'
+    const permissoesGerente = [
+      { rota: 'dashboard', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'produtos', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 1 },
+      { rota: 'vendas', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'funcionarios', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'estoque', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'relatorios', pode_ler: 1, pode_criar: 0, pode_editar: 0, pode_deletar: 0 },
+      { rota: 'categorias', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'controle_financeiro', pode_ler: 1, pode_criar: 1, pode_editar: 1, pode_deletar: 0 },
+      { rota: 'configuracoes', pode_ler: 1, pode_criar: 0, pode_editar: 0, pode_deletar: 0 },
+      { rota: 'usuarios', pode_ler: 1, pode_criar: 0, pode_editar: 0, pode_deletar: 0 }
+    ];
+    
+    console.log('📋 Configurando permissões para cargo gerente...');
+    
+    // Inserir ou atualizar permissões
+    for (const perm of permissoesGerente) {
+      const sql = `
+        INSERT OR REPLACE INTO permissoes_cargo (cargo, rota, pode_ler, pode_criar, pode_editar, pode_deletar)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      
+      await run(sql, ['gerente', perm.rota, perm.pode_ler, perm.pode_criar, perm.pode_editar, perm.pode_deletar]);
+      console.log(`✅ Permissão ${perm.rota} configurada para gerente`);
+    }
+    
+    console.log('🎉 Permissões configuradas com sucesso!');
+    
+    res.json({
+      success: true,
+      message: 'Permissões configuradas para cargo gerente',
+      data: { cargo: 'gerente', permissoes: permissoesGerente.length }
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao configurar permissões:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+});
+
 // POST /api/auth/corrigir-eryck - Corrigir cargo do usuário eryck temporariamente (REMOVER EM PRODUÇÃO)
 router.post('/corrigir-eryck', async (req, res) => {
   try {
