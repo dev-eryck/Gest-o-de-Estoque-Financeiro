@@ -125,6 +125,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚂 Railway Environment: ${process.env.RAILWAY_ENVIRONMENT_NAME}`);
   console.log(`📊 Health check disponível em: /api/health`);
   console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
+  console.log(`✅ Versão: 1.0.3 - Deploy forçado em ${new Date().toISOString()}`);
 });
 
 // Lidar com sinais graciosamente
