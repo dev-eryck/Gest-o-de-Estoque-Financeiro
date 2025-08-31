@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -10,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 // Forçar modo produção se estiver no Railway
 const NODE_ENV = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' ? 'production' : (process.env.NODE_ENV || 'development');
 
-// Middleware
+// Middleware de segurança otimizado para produção
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -23,15 +25,61 @@ app.use(helmet({
       frameSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      upgradeInsecureRequests: []
+      upgradeInsecureRequests: true,
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+      scriptSrcAttr: ["'none'"]
     }
-  }
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  noSniff: true,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 app.use(morgan('combined'));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true
 }));
+
+// Rate limiting para proteção contra ataques
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // limite de 100 requests por IP por janela
+  message: {
+    success: false,
+    error: 'Too many requests',
+    message: 'Muitas requisições. Tente novamente em alguns minutos.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Aplicar rate limiting a todas as rotas
+app.use(limiter);
+
+// Rate limiting específico para autenticação
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // limite de 5 tentativas de login por IP por janela
+  message: {
+    success: false,
+    error: 'Too many login attempts',
+    message: 'Muitas tentativas de login. Tente novamente em alguns minutos.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Aplicar rate limiting específico às rotas de autenticação
+app.use('/api/auth', authLimiter);
+
+// Compressão para melhorar performance
+app.use(compression());
 
 // Parse JSON
 app.use(express.json());
@@ -44,13 +92,11 @@ app.get('/api/health', (req, res) => {
     port: PORT,
     env: NODE_ENV,
     railway_env: process.env.RAILWAY_ENVIRONMENT_NAME,
-    version: '1.0.1' // Forçar deploy
+    version: '1.0.2'
   });
 });
 
 // Routes
-app.use('/api/corrigir-banco', require('./routes/corrigir-banco'));
-app.use('/api/teste-banco', require('./routes/teste-banco'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/produtos', require('./routes/produtos'));
 app.use('/api/vendas', require('./routes/vendas'));
