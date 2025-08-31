@@ -20,6 +20,58 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+// POST /api/auth/criar-eryck - Criar usuário eryck temporariamente (REMOVER EM PRODUÇÃO)
+router.post('/criar-eryck', async (req, res) => {
+  try {
+    console.log('🔐 Criando usuário eryck temporariamente...');
+    
+    const username = 'eryck';
+    const senha = '300406';
+    const email = 'eryck@temp.com';
+    const nome_completo = 'Eryck Temporário';
+    const cargo = 'gerente';
+    
+    // Verificar se usuário já existe
+    const usuarioExistente = await get('SELECT id FROM usuarios WHERE username = ?', [username]);
+    
+    if (usuarioExistente) {
+      console.log('⚠️ Usuário eryck já existe, atualizando senha...');
+      
+      // Atualizar senha
+      const senhaHash = await bcrypt.hash(senha, 12);
+      await run('UPDATE usuarios SET senha_hash = ? WHERE username = ?', [senhaHash, username]);
+      
+      return res.json({
+        success: true,
+        message: 'Usuário eryck atualizado com sucesso',
+        data: { username, cargo }
+      });
+    }
+    
+    // Criar novo usuário
+    const senhaHash = await bcrypt.hash(senha, 12);
+    const result = await run(
+      'INSERT INTO usuarios (username, email, senha_hash, nome_completo, cargo, ativo) VALUES (?, ?, ?, ?, ?, 1)',
+      [username, email, senhaHash, nome_completo, cargo]
+    );
+    
+    console.log('✅ Usuário eryck criado com ID:', result.lastID);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Usuário eryck criado com sucesso',
+      data: { username, cargo }
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao criar usuário eryck:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+});
+
 // POST /api/auth/login - Login do usuário
 router.post('/login', [
   body('username').notEmpty().withMessage('Username é obrigatório'),
