@@ -43,7 +43,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     port: PORT,
     env: NODE_ENV,
-    railway_env: process.env.RAILWAY_ENVIRONMENT_NAME
+    railway_env: process.env.RAILWAY_ENVIRONMENT_NAME,
+    version: '1.0.1' // Forçar deploy
   });
 });
 
