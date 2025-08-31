@@ -144,8 +144,13 @@ router.post('/movimentacao', [
 
     const { produto_id, tipo, quantidade, motivo, funcionario_id } = req.body;
 
+    // Converter para números para evitar concatenação
+    const produtoId = parseInt(produto_id);
+    const quantidadeNum = parseInt(quantidade);
+    const funcionarioId = funcionario_id ? parseInt(funcionario_id) : null;
+
     // Verificar se produto existe
-    const produto = await get('SELECT id, nome, quantidade FROM produtos WHERE id = ?', [produto_id]);
+    const produto = await get('SELECT id, nome, quantidade FROM produtos WHERE id = ?', [produtoId]);
     if (!produto) {
       return res.status(404).json({
         success: false,
@@ -154,8 +159,8 @@ router.post('/movimentacao', [
     }
 
     // Verificar se funcionário existe (se fornecido)
-    if (funcionario_id) {
-      const funcionario = await get('SELECT id FROM funcionarios WHERE id = ?', [funcionario_id]);
+    if (funcionarioId) {
+      const funcionario = await get('SELECT id FROM funcionarios WHERE id = ?', [funcionarioId]);
       if (!funcionario) {
         return res.status(404).json({
           success: false,
@@ -170,20 +175,20 @@ router.post('/movimentacao', [
     // Calcular nova quantidade baseada no tipo
     switch (tipo) {
       case 'entrada':
-        quantidadeNova = quantidadeAnterior + quantidade;
+        quantidadeNova = quantidadeAnterior + quantidadeNum;
         break;
       case 'saida':
-        if (quantidade > quantidadeAnterior) {
+        if (quantidadeNum > quantidadeAnterior) {
           return res.status(400).json({
             success: false,
             error: 'Quantidade insuficiente',
-            message: `Estoque atual: ${quantidadeAnterior}, tentativa de saída: ${quantidade}`
+            message: `Estoque atual: ${quantidadeAnterior}, tentativa de saída: ${quantidadeNum}`
           });
         }
-        quantidadeNova = quantidadeAnterior - quantidade;
+        quantidadeNova = quantidadeAnterior - quantidadeNum;
         break;
       case 'ajuste':
-        quantidadeNova = quantidade;
+        quantidadeNova = quantidadeNum;
         break;
     }
 
@@ -192,13 +197,13 @@ router.post('/movimentacao', [
 
     try {
       // Atualizar estoque do produto
-      await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [quantidadeNova, produto_id]);
+      await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [quantidadeNova, produtoId]);
 
       // Registrar movimentação
       const result = await run(`
         INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data, created_at, updated_at)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, [produto_id, tipo, quantidade, motivo || null]);
+      `, [produtoId, tipo, quantidadeNum, motivo || null]);
 
       // Confirmar transação
       await run('COMMIT');
@@ -217,7 +222,7 @@ router.post('/movimentacao', [
         data: {
           movimentacao,
           produto_atualizado: {
-            id: produto_id,
+            id: produtoId,
             quantidade_anterior: quantidadeAnterior,
             quantidade_nova: quantidadeNova
           }

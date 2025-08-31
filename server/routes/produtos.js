@@ -309,7 +309,11 @@ router.patch('/:id/estoque', [
     const { id } = req.params;
     const { quantidade, tipo, motivo, funcionario_id } = req.body;
     
-    if (!id || isNaN(id)) {
+    // Converter para números para evitar concatenação
+    const produtoId = parseInt(id);
+    const quantidadeNum = parseInt(quantidade);
+    
+    if (!produtoId || isNaN(produtoId)) {
       return res.status(400).json({
         success: false,
         error: 'ID inválido'
@@ -327,7 +331,7 @@ router.patch('/:id/estoque', [
     }
 
     // Verificar se produto existe
-    const produto = await get('SELECT id, nome, quantidade FROM produtos WHERE id = ?', [id]);
+    const produto = await get('SELECT id, nome, quantidade FROM produtos WHERE id = ?', [produtoId]);
     if (!produto) {
       return res.status(404).json({
         success: false,
@@ -341,27 +345,27 @@ router.patch('/:id/estoque', [
     // Calcular nova quantidade baseada no tipo
     switch (tipo) {
       case 'entrada':
-        quantidadeNova = quantidadeAnterior + quantidade;
+        quantidadeNova = quantidadeAnterior + quantidadeNum;
         break;
       case 'saida':
-        quantidadeNova = Math.max(0, quantidadeAnterior - quantidade);
+        quantidadeNova = Math.max(0, quantidadeAnterior - quantidadeNum);
         break;
       case 'ajuste':
-        quantidadeNova = quantidade;
+        quantidadeNova = quantidadeNum;
         break;
     }
 
     // Atualizar estoque
-          await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [quantidadeNova, id]);
+    await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [quantidadeNova, produtoId]);
 
     // Registrar movimentação
     await run(`
       INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data, created_at, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `, [id, tipo, quantidade, motivo || null]);
+    `, [produtoId, tipo, quantidadeNum, motivo || null]);
 
     // Buscar produto atualizado
-    const produtoAtualizado = await get('SELECT * FROM produtos WHERE id = ?', [id]);
+    const produtoAtualizado = await get('SELECT * FROM produtos WHERE id = ?', [produtoId]);
 
     res.json({
       success: true,
@@ -370,7 +374,7 @@ router.patch('/:id/estoque', [
         produto: produtoAtualizado,
         movimentacao: {
           tipo,
-          quantidade,
+          quantidade: quantidadeNum,
           quantidade_anterior: quantidadeAnterior,
           quantidade_nova: quantidadeNova,
           motivo

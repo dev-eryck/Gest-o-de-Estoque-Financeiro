@@ -134,7 +134,10 @@ router.post('/', validateFuncionario, async (req, res) => {
 
     const { nome, cargo, telefone, email, cpf, endereco, data_admissao, salario, status } = req.body;
     
-    console.log('🔍 Dados extraídos:', { nome, cargo, telefone, email, cpf, endereco, data_admissao, salario, status });
+    // Converter salário para número se fornecido
+    const salarioNum = salario ? parseFloat(salario) : null;
+    
+    console.log('🔍 Dados extraídos:', { nome, cargo, telefone, email, cpf, endereco, data_admissao, salario: salarioNum, status });
 
     // Verificar se email já existe
     if (email) {
@@ -175,7 +178,7 @@ router.post('/', validateFuncionario, async (req, res) => {
       cpf || null, 
       endereco || null, 
       data_admissao || null, 
-      salario || null, 
+      salarioNum, 
       status || 'ativo'
     ];
     
@@ -239,6 +242,9 @@ router.put('/:id', validateFuncionario, async (req, res) => {
     }
 
     const { nome, cargo, telefone, email, cpf, endereco, data_admissao, salario, status } = req.body;
+    
+    // Converter salário para número se fornecido
+    const salarioNum = salario ? parseFloat(salario) : null;
 
     // Verificar se email já existe em outro funcionário
     if (email) {
@@ -277,7 +283,7 @@ router.put('/:id', validateFuncionario, async (req, res) => {
       cpf || null, 
       endereco || null, 
       data_admissao || null, 
-      salario || null, 
+      salarioNum, 
       status || 'ativo',
       id
     ];

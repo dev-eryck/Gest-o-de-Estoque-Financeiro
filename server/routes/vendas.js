@@ -130,8 +130,13 @@ router.post('/', validateVenda, async (req, res) => {
 
     const { produto_id, funcionario_id, quantidade, observacao } = req.body;
 
+    // Converter para números para evitar concatenação
+    const produtoId = parseInt(produto_id);
+    const funcionarioId = parseInt(funcionario_id);
+    const quantidadeNum = parseInt(quantidade);
+
     // Verificar se produto existe e tem estoque suficiente
-    const produto = await get('SELECT id, nome, quantidade, preco_venda, preco_custo FROM produtos WHERE id = ?', [produto_id]);
+    const produto = await get('SELECT id, nome, quantidade, preco_venda, preco_custo FROM produtos WHERE id = ?', [produtoId]);
     if (!produto) {
       return res.status(404).json({
         success: false,
@@ -139,16 +144,16 @@ router.post('/', validateVenda, async (req, res) => {
       });
     }
 
-    if (produto.quantidade < quantidade) {
+    if (produto.quantidade < quantidadeNum) {
       return res.status(400).json({
         success: false,
         error: 'Estoque insuficiente',
-        message: `Estoque atual: ${produto.quantidade}, quantidade solicitada: ${quantidade}`
+        message: `Estoque atual: ${produto.quantidade}, quantidade solicitada: ${quantidadeNum}`
       });
     }
 
     // Verificar se funcionário existe
-    const funcionario = await get('SELECT id, nome FROM funcionarios WHERE id = ?', [funcionario_id]);
+    const funcionario = await get('SELECT id, nome FROM funcionarios WHERE id = ?', [funcionarioId]);
     if (!funcionario) {
       return res.status(404).json({
         success: false,
@@ -157,8 +162,8 @@ router.post('/', validateVenda, async (req, res) => {
     }
 
     const preco_unitario = produto.preco_venda;
-    const total = quantidade * preco_unitario;
-    const custo_total = quantidade * produto.preco_custo;
+    const total = quantidadeNum * preco_unitario;
+    const custo_total = quantidadeNum * produto.preco_custo;
     const lucro = total - custo_total;
 
     // Iniciar transação
@@ -169,29 +174,29 @@ router.post('/', validateVenda, async (req, res) => {
       const result = await run(`
         INSERT INTO vendas (produto_id, funcionario_id, quantidade, preco_unitario, total, observacao, data)
         VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-      `, [produto_id, funcionario_id, quantidade, preco_unitario, total, observacao || null]);
+      `, [produtoId, funcionarioId, quantidadeNum, preco_unitario, total, observacao || null]);
 
       // Atualizar estoque do produto
-      const novaQuantidade = produto.quantidade - quantidade;
-      await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [novaQuantidade, produto_id]);
+      const novaQuantidade = produto.quantidade - quantidadeNum;
+      await run('UPDATE produtos SET quantidade = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [novaQuantidade, produtoId]);
 
       // Registrar movimentação de estoque
       await run(`
         INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data, created_at, updated_at)
         VALUES (?, 'saida', ?, 'Venda', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, [produto_id, quantidade]);
+      `, [produtoId, quantidadeNum]);
 
       // Registrar no sistema financeiro
       await run(`
         INSERT INTO controle_financeiro (tipo, descricao, valor, data, categoria, observacao, created_at, updated_at)
         VALUES (?, ?, ?, DATE('now'), ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, ['venda', `Venda de ${produto.nome}`, total, 'Vendas', `Venda de ${quantidade}x ${produto.nome} - Lucro: R$ ${lucro.toFixed(2)}`]);
+      `, ['venda', `Venda de ${produto.nome}`, total, 'Vendas', `Venda de ${quantidadeNum}x ${produto.nome} - Lucro: R$ ${lucro.toFixed(2)}`]);
 
       // Registrar o custo da venda
       await run(`
         INSERT INTO controle_financeiro (tipo, descricao, valor, data, categoria, observacao, created_at, updated_at)
         VALUES (?, ?, ?, DATE('now'), ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, ['custo', `Custo da venda de ${produto.nome}`, custo_total, 'Custos de Vendas', `Custo de ${quantidade}x ${produto.nome}`]);
+      `, ['custo', `Custo da venda de ${produto.nome}`, custo_total, 'Custos de Vendas', `Custo de ${quantidadeNum}x ${produto.nome}`]);
 
       // Confirmar transação
       await run('COMMIT');
