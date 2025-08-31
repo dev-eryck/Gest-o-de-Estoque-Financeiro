@@ -1,5 +1,6 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
+  "comment": "Forçar deploy para criar usuário eryck",
   "build": {
     "builder": "DOCKERFILE"
   },
