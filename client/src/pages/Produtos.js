@@ -377,6 +377,9 @@ const Produtos = () => {
                   Preço Custo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Margem Lucro
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estoque
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -390,7 +393,7 @@ const Produtos = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProdutos.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                     <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p className="text-lg font-medium">Nenhum produto encontrado</p>
                     <p className="text-sm">Comece adicionando seu primeiro produto!</p>
@@ -422,6 +425,22 @@ const Produtos = () => {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         R$ {parseFloat(produto.preco_custo || 0).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {(() => {
+                          const precoVenda = parseFloat(produto.preco_venda || 0);
+                          const precoCusto = parseFloat(produto.preco_custo || 0);
+                          if (precoCusto > 0) {
+                            const margem = ((precoVenda - precoCusto) / precoCusto * 100);
+                            const color = margem > 50 ? 'text-green-600' : margem > 20 ? 'text-yellow-600' : 'text-red-600';
+                            return (
+                              <span className={`text-sm font-medium ${color}`}>
+                                {margem.toFixed(1)}%
+                              </span>
+                            );
+                          }
+                          return <span className="text-sm text-gray-400">-</span>;
+                        })()}
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">{produto.quantidade}</div>

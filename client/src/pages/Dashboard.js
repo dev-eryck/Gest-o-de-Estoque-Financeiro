@@ -53,15 +53,19 @@ const Dashboard = () => {
 
       setProdutosBaixoEstoque(baixoEstoque);
 
-      // Dados para gráficos
-      const vendasPorMesData = [
-        { mes: 'Jan', vendas: 12, valor: 2400 },
-        { mes: 'Fev', vendas: 19, valor: 3800 },
-        { mes: 'Mar', vendas: 15, valor: 3000 },
-        { mes: 'Abr', vendas: 22, valor: 4400 },
-        { mes: 'Mai', vendas: 18, valor: 3600 },
-        { mes: 'Jun', vendas: 25, valor: 5000 }
-      ];
+      // Calcular dados reais de vendas por mês
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const vendasPorMesData = meses.map((mes, index) => {
+        const vendasDoMes = vendas.filter(v => new Date(v.data).getMonth() === index);
+        const totalVendas = vendasDoMes.length;
+        const valorTotal = vendasDoMes.reduce((sum, v) => sum + (v.preco_unitario * v.quantidade), 0);
+        
+        return {
+          mes,
+          vendas: totalVendas,
+          valor: valorTotal
+        };
+      });
 
       // Calcular produtos por categoria usando dados reais
       const categoriasCount = {};

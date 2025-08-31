@@ -45,29 +45,60 @@ const Relatorios = () => {
         valorTotal: valorTotal.toFixed(2)
       });
 
-      // Simular dados de vendas por mês (em um sistema real, viria da API)
+      // Calcular dados reais de vendas por mês
       const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-      const vendasPorMesData = meses.map((mes, index) => ({
-        mes,
-        vendas: Math.floor(Math.random() * 50) + 10,
-        valor: Math.floor(Math.random() * 5000) + 1000
-      }));
+      const vendasPorMesData = meses.map((mes, index) => {
+        const vendasDoMes = vendas.filter(v => new Date(v.data).getMonth() === index);
+        const totalVendas = vendasDoMes.length;
+        const valorTotal = vendasDoMes.reduce((sum, v) => sum + (v.preco_unitario * v.quantidade), 0);
+        
+        return {
+          mes,
+          vendas: totalVendas,
+          valor: valorTotal
+        };
+      });
       setVendasPorMes(vendasPorMesData);
 
-      // Simular produtos por categoria
-      const categorias = ['Bebidas', 'Comidas', 'Limpeza', 'Outros'];
-      const produtosPorCategoriaData = categorias.map(cat => ({
-        categoria: cat,
-        quantidade: Math.floor(Math.random() * 20) + 5
+      // Calcular produtos por categoria usando dados reais
+      const categoriasCount = {};
+      produtos.forEach(produto => {
+        if (produto.categoria) {
+          categoriasCount[produto.categoria] = (categoriasCount[produto.categoria] || 0) + 1;
+        }
+      });
+      
+      const produtosPorCategoriaData = Object.entries(categoriasCount).map(([categoria, quantidade]) => ({
+        categoria,
+        quantidade
       }));
       setProdutosPorCategoria(produtosPorCategoriaData);
 
-      // Simular top produtos
-      const topProdutosData = produtos.slice(0, 5).map((prod, index) => ({
-        nome: prod.nome,
-        vendas: Math.floor(Math.random() * 100) + 10,
-        valor: (prod.preco_venda * (Math.floor(Math.random() * 100) + 10)).toFixed(2)
-      }));
+      // Calcular top produtos baseado em vendas reais
+      const produtosVendidos = {};
+      vendas.forEach(venda => {
+        const produto = produtos.find(p => p.id === venda.produto_id);
+        if (produto) {
+          if (!produtosVendidos[produto.id]) {
+            produtosVendidos[produto.id] = {
+              nome: produto.nome,
+              vendas: 0,
+              valor: 0
+            };
+          }
+          produtosVendidos[produto.id].vendas += venda.quantidade;
+          produtosVendidos[produto.id].valor += venda.preco_unitario * venda.quantidade;
+        }
+      });
+      
+      const topProdutosData = Object.values(produtosVendidos)
+        .sort((a, b) => b.valor - a.valor)
+        .slice(0, 5)
+        .map(prod => ({
+          nome: prod.nome,
+          vendas: prod.vendas,
+          valor: prod.valor.toFixed(2)
+        }));
       setTopProdutos(topProdutosData);
 
     } catch (error) {

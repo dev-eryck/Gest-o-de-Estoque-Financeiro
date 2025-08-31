@@ -71,21 +71,29 @@ const ControleFinanceiro = () => {
   }, [fetchData]);
 
   const generateChartData = (transacoes) => {
-    // Dados de vendas por mês
-    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const vendasPorMesData = meses.map((mes, index) => {
-      const mesTransacoes = transacoes.filter(t => 
-        t.tipo === 'venda' && 
-        new Date(t.data).getMonth() === index
-      );
-      const totalVendas = mesTransacoes.reduce((sum, t) => sum + parseFloat(t.valor), 0);
-      
-      return {
-        mes,
-        vendas: totalVendas,
-        lucro: totalVendas * 0.3 // Simulação de lucro de 30%
-      };
-    });
+          // Dados de vendas por mês
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const vendasPorMesData = meses.map((mes, index) => {
+        const mesTransacoes = transacoes.filter(t => 
+          t.tipo === 'venda' && 
+          new Date(t.data).getMonth() === index
+        );
+        const totalVendas = mesTransacoes.reduce((sum, t) => sum + parseFloat(t.valor), 0);
+        
+        // Calcular lucro real baseado em custos e receitas
+        const custosMes = transacoes.filter(t => 
+          t.tipo === 'custo' && 
+          new Date(t.data).getMonth() === index
+        ).reduce((sum, t) => sum + parseFloat(t.valor), 0);
+        
+        const lucro = totalVendas - custosMes;
+        
+        return {
+          mes,
+          vendas: totalVendas,
+          lucro: lucro
+        };
+      });
     
     setVendasPorMes(vendasPorMesData);
   };
