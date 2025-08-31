@@ -49,9 +49,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/produtos', require('./routes/produtos'));
 app.use('/api/vendas', require('./routes/vendas'));
 app.use('/api/funcionarios', require('./routes/funcionarios'));
+app.use('/api/estoque', require('./routes/estoque'));
+app.use('/api/categorias', require('./routes/categorias'));
+app.use('/api/controle-financeiro', require('./routes/controle-financeiro'));
+app.use('/api/notificacoes', require('./routes/notificacoes'));
 app.use('/api/auth', require('./routes/auth'));
 
 // Serve static files from React build
