@@ -49,6 +49,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/teste-banco', require('./routes/teste-banco'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/produtos', require('./routes/produtos'));
 app.use('/api/vendas', require('./routes/vendas'));
