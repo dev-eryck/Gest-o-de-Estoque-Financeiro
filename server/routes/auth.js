@@ -20,6 +20,59 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+// POST /api/auth/corrigir-eryck - Corrigir cargo do usuário eryck temporariamente (REMOVER EM PRODUÇÃO)
+router.post('/corrigir-eryck', async (req, res) => {
+  try {
+    console.log('🔐 Corrigindo usuário eryck...');
+    
+    // Verificar se usuário existe
+    const usuarioExistente = await get('SELECT id, cargo FROM usuarios WHERE username = ?', ['eryck']);
+    
+    if (!usuarioExistente) {
+      console.log('❌ Usuário eryck não encontrado, criando...');
+      
+      // Criar usuário com cargo correto
+      const username = 'eryck';
+      const senha = '300406';
+      const email = 'eryck@temp.com';
+      const nome_completo = 'Eryck Gerente';
+      const cargo = 'gerente';
+      
+      const senhaHash = await bcrypt.hash(senha, 12);
+      const result = await run(
+        'INSERT INTO usuarios (username, email, senha_hash, nome_completo, cargo, ativo) VALUES (?, ?, ?, ?, ?, 1)',
+        [username, email, senhaHash, nome_completo, cargo]
+      );
+      
+      console.log('✅ Usuário eryck criado com cargo gerente, ID:', result.lastID);
+      
+      return res.json({
+        success: true,
+        message: 'Usuário eryck criado com cargo gerente',
+        data: { username, cargo }
+      });
+    }
+    
+    // Atualizar cargo para 'gerente'
+    await run('UPDATE usuarios SET cargo = ? WHERE username = ?', ['gerente', 'eryck']);
+    
+    console.log('✅ Cargo do usuário eryck atualizado para gerente');
+    
+    res.json({
+      success: true,
+      message: 'Cargo do usuário eryck corrigido para gerente',
+      data: { username: 'eryck', cargo: 'gerente' }
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao corrigir usuário eryck:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+});
+
 // POST /api/auth/criar-eryck - Criar usuário eryck temporariamente (REMOVER EM PRODUÇÃO)
 router.post('/criar-eryck', async (req, res) => {
   try {
