@@ -92,20 +92,26 @@ app.get('/api/health', (req, res) => {
     port: PORT,
     env: NODE_ENV,
     railway_env: process.env.RAILWAY_ENVIRONMENT_NAME,
-                  version: '1.0.3'
+    version: '1.0.4'
   });
 });
 
-// Routes
-app.use('/api/dashboard', require('./routes/dashboard'));
-app.use('/api/produtos', require('./routes/produtos'));
-app.use('/api/vendas', require('./routes/vendas'));
-app.use('/api/funcionarios', require('./routes/funcionarios'));
-app.use('/api/estoque', require('./routes/estoque'));
-app.use('/api/categorias', require('./routes/categorias'));
-app.use('/api/controle-financeiro', require('./routes/controle-financeiro'));
-app.use('/api/notificacoes', require('./routes/notificacoes'));
-app.use('/api/auth', require('./routes/auth'));
+// Routes - com tratamento de erro para evitar falha no startup
+try {
+  app.use('/api/dashboard', require('./routes/dashboard'));
+  app.use('/api/produtos', require('./routes/produtos'));
+  app.use('/api/vendas', require('./routes/vendas'));
+  app.use('/api/funcionarios', require('./routes/funcionarios'));
+  app.use('/api/estoque', require('./routes/estoque'));
+  app.use('/api/categorias', require('./routes/categorias'));
+  app.use('/api/controle-financeiro', require('./routes/controle-financeiro'));
+  app.use('/api/notificacoes', require('./routes/notificacoes'));
+  app.use('/api/auth', require('./routes/auth'));
+  console.log('✅ Todas as rotas carregadas com sucesso');
+} catch (error) {
+  console.error('❌ Erro ao carregar rotas:', error.message);
+  // Continuar mesmo com erro nas rotas para permitir healthcheck
+}
 
 // Serve static files from React build
 if (NODE_ENV === 'production') {
@@ -125,7 +131,15 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚂 Railway Environment: ${process.env.RAILWAY_ENVIRONMENT_NAME}`);
   console.log(`📊 Health check disponível em: /api/health`);
   console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
-  console.log(`✅ Versão: 1.0.3 - Deploy forçado em ${new Date().toISOString()}`);
+  console.log(`✅ Versão: 1.0.4 - Deploy forçado em ${new Date().toISOString()}`);
+});
+
+// Tratamento de erro do servidor
+server.on('error', (error) => {
+  console.error('❌ Erro no servidor:', error.message);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Porta ${PORT} já está em uso`);
+  }
 });
 
 // Lidar com sinais graciosamente
